@@ -1,0 +1,150 @@
+Lab3: Book Store
+Add a Collaborator to Nitrous.io
+	
+Within the dashboard, navigate to the Collaborators tab within the container settings. From here you can add a collaborator by entering in their username or email. 
+Enter: basel.magableh@icloud.com  and click Add
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+In the previous lab example we created our first Rails application and got it up and running. The application was created using scaffolding and it automatically generated a large amount of code to help create the web application in a rapid manner. In this lab we will require functionality for the application that is a little different. The basic operations of Rails will be discussed, showing how things work in the framework. 
+For this lab work we will create a web application for a bookstore manager who wants to sell second hand books online. The bookstore acts as an intermediary by selling books for any third party. If we brought a book to this store they would try sell it for us. The bookstore already has a data entry system and they do not require the website to have the functionality to add a book to the system. The bookstore will insert the data into the tables when the application has been created. 
+What information is required for the application? 
+
+Step 1: Create a new Rails application named bookstore
+> rails new bookstore
+ This has created the infrastructure for the new web application. It created a folder named bookstore and a lot of files and folders for the application. 
+Why don't we just use scaffolding to create the functionality for the new site? 
+The problem with scaffolding is it creates the code to allow users to edit the data. Running a scaffold creates CRUD functionality for the site. CRUD stands for create, read, update, and delete. 
+For the bookstore they only want to publish the second hand books for sale. They don't want users of the site to be able to modify or delete the data. Scaffolding does way too much. The bookstore application only requires a small part of the functionality that would be offered using scaffolding. It is sometimes better to build the application manually. To do this we will need to understand how Rails operates. 
+
+Step 2: Generate the Model 
+The first item to be created will be the model code. This will create the structure of the data in the model and this will affect both the controller and the view. 
+(When running the rails generate command, make sure you are in the application folder) 
+Creating the model is very similar to creating scaffolding. 
+>rails generate model advert name:string description:text price:decimal seller_id:integer email:string 
+When the above command has been run in the terminal it creates the ad model. The model-generator command creates two key scripts within the app and db subfolders: 
+➔ the model class (app/models/advert.rb) 
+➔ the data migration (db/migrate/..._create_advertss.rb) Check that these files and folders have been created. 
+Step 3.a: Create the database table using rake 
+To create the database table, use the rake db:migrate command:
+ rake db:migrate this will create a database named development  in the db folder. 
+The rake command will create the database table using the data contained in the file (db/migrate/..._create_adverts.rb). It will match the data used when we created the model. Rails follows the principle of DRY (Don't Repeat Yourself), it will re-use the information we entered earlier. 
+Rake adds three additional columns to the database table it creates. 
+
+id is the primary key for the database table. 
+While rake created the database table for us, we will need to insert some data into the new table. 
+
+
+
+
+Step 3.b: Insert data to table using Rails console 
+In nitrous we need to do the following to insert new record. 
+first we need to access rails console:
+Rails c
+u = Advert.new  (this will create a new recored in Advert table as it is associated with u object) 
+u.id=1
+u.name = “My first add”
+u.description = “ad description”
+u.save!  (this command will save the recored)
+ exit (to go back to nitrous shell 
+
+
+
+Step 4: Create the Controller 
+The next step is to setup the Controller. The syntax is similar to the scaffolding command. 
+For the Rails naming convention Models have singular names but controllers and tables are plural. 
+rails generate controller adverts 
+This generates the adverts_controller.rb file in the controllers folder (controllers\adverts_controller.rb) Check where this file is located!! 
+Code will need to be added to this new controller, this will be done later!! 
+Step 5: Create the View 
+What do we need to create? The bookstore web application only needs a single page, and this will be used as a template for all of the ads on the website. Pages in Rails are often referred to as templates. 
+Web pages are created from templates by Embedded Ruby (called Erb) If a site user asks for ad #4, Erb will generate the HTML web page using the page template and the data from the model. 
+First we will need to create the ad template page. Open the Text Editor and create a file called show.html.erb in the folder app/view/adverts 
+Enter the following html to the new page and save.
+
+<html> <head> <title>View Book</title> 
+</head> <body> <p> 
+<b>Name:</b> </p> 
+<p> <b>Description:</b> 
+</p> <p> 
+<b>Price:</b> </p> 
+<p> <b>Seller Id:</b> 
+</p> <p> 
+<b>Email:</b> </p> 
+</body> 
+</html> 
+With the new page created start the server and see what it looks like!! Enter the following command in the terminal window (make sure you are in the project folder!!)
+ rails s  -b 0.0.0.0
+From Nitrous.io IDE, do preview 3000
+The page is not showing?? We need to update the routes file!! 
+CTRL+C to shutdown the server 
+Step 6: Update the routes 
+Rails needs a rule to say which code to run for a given URL. Open the routes.rb from the config folder. Add the following route:
+ get 'adverts/:id' => 'adverts#show' 
+
+This matches the page request from the URL to the controller and view in our web application. 
+ie. http://0.0.0.0:3000/adverts/1 
+Please note, 0.0.0.0 stand for any IP assigned by Nitrous
+The match looks for /adverts/1 in the page request and then tells the application which controller to use and the action to take, in this example we display the show template. 
+Step 7: Adding dynamic content 
+Now we have the application wired up and displaying the show template, we can add some information from the database to the pages. 
+If we wanted to display information on the second hand book with the id of 3, we would enter the following: http://127.0.0.1:3000/adverts/1 
+The number 1 is the id and this matches up with the structure of the database table!! 
+
+
+First we need to update the code on our ads controller class 
+
+
+class AdvertssController < ApplicationController 
+def show @ad = Advert.find(params[:id]) 
+end 
+end 
+
+We create a method named show. This is called from the route we added earlier. The controller assigns the data to a variable called @ad. The params[:id] gets the id as it was contained in the page url. (http://127.0.0.1:3000/adverts/1) 
+Ad.find locates the appropriate book from the database table. The data in @ad will be passed to the view to be displayed to the user. 
+The final step is to update the view 
+<html> <head> <title>View Book</title> </head> <body> <p> 
+<b>Name: </b><%= @ad.name %> </p> 
+<p> <b>Description:</b><%= @ad.description %> 
+</p> <p> 
+<b>Price:</b><%= @ad.price %> </p> 
+<p> <b>Seller Id:</b><%= @ad.seller_id %> 
+</p> <p> 
+<b>Email:</b><%= @ad.email %> </p> 
+</body> </html> 
+The page template (show.html.erb) isn't just sent straight back to the browser. The page gets processed by the Embedded Ruby program Erb, this is the reason the page template has a file extension of .erb!! 
+ERB reads through the template looking for little pieces of embedded Ruby code called expressions. An expression takes the following format: <%= (some code) %> 
+As a simple example if it finds <%= 1+1 %> Erb will replace this with the value 2. 
+So for all the expressions on the page Rails will replace them with their object values!! 
+Step 8:  Run Server 
+Save all your files. Run the server and enter http://0.0.0.0:3000/adverts/1 in the browser. You should now see a page similar to: 
+	
+Step 9: Add the following functionality to the site 
+Create a page to list all books for sale with a link to the show page template (See Appendix A)  Appendix A 
+Controller Code – Advert.all lists all books in the database 
+def index @my_adverts = Advert.all 
+End 
+View code for the index 
+<% @my_adverts.each do |ad| %> <li><a href="/adverts/<%= ad.id %>"><%= ad.name %></a></li> <% end %> 
+Don’t forget to update the routes!!!! 
+get 'adverts/:id' => 'adverts#show' get 'adverts' => 'adverts#index' 
+
+
+
+
+
+
