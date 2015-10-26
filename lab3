@@ -1,6 +1,4 @@
 Lab3: Book Store
-Add a Collaborator to Nitrous.io
- 
 
 
 In the previous lab example we created our first Rails application and got it up and running. The application was created using scaffolding and it automatically generated a large amount of code to help create the web application in a rapid manner. In this lab we will require functionality for the application that is a little different. The basic operations of Rails will be discussed, showing how things work in the framework. 
